@@ -1,0 +1,973 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Asia 2027 — Trip bible</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#14231F;
+    --ink-2:#1C332C;
+    --paper:#F1E9D8;
+    --paper-2:#E7DCC4;
+    --jade:#3E7C6B;
+    --jade-dark:#255245;
+    --brass:#C79A4B;
+    --chop:#A63A2E;
+    --line:#D8CBA8;
+    --text-on-paper:#221C10;
+    --text-muted-paper:#6B6250;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--ink);color:var(--paper);font-family:'IBM Plex Sans',sans-serif;-webkit-font-smoothing:antialiased;}
+  ::selection{background:var(--brass);color:var(--ink);}
+
+  .wrap{max-width:960px;margin:0 auto;padding:0 20px 80px;}
+
+  /* ---- header / boarding pass strip ---- */
+  header.hero{
+    background:linear-gradient(180deg,var(--ink-2),var(--ink));
+    border-bottom:1px solid #2C4038;
+    padding:40px 0 0;
+  }
+  .tag{
+    display:flex;justify-content:space-between;align-items:flex-end;
+    background:var(--paper);color:var(--text-on-paper);
+    border-radius:14px 14px 0 0;
+    padding:26px 30px 22px;
+    position:relative;
+    margin:0 0 0;
+  }
+  .tag::after{
+    content:"";position:absolute;left:0;right:0;bottom:-1px;height:1px;
+    background:repeating-linear-gradient(90deg,var(--ink) 0 10px, transparent 10px 18px);
+  }
+  .tag-left h1{
+    font-family:'Fraunces',serif;font-weight:600;font-size:34px;margin:0 0 6px;
+    letter-spacing:-0.01em;
+    outline:none;
+  }
+  .tag-left .route{
+    font-family:'IBM Plex Mono',monospace;font-size:13px;color:var(--jade-dark);
+    letter-spacing:0.04em;text-transform:uppercase;
+  }
+  .tag-right{text-align:right;font-family:'IBM Plex Mono',monospace;}
+  .tag-right .dates{font-size:15px;font-weight:500;}
+  .tag-right .pax{font-size:12px;color:var(--text-muted-paper);margin-top:4px;}
+  [contenteditable="true"]{cursor:text;border-radius:4px;}
+  [contenteditable="true"]:hover{background:rgba(0,0,0,0.04);}
+  [contenteditable="true"]:focus{background:rgba(0,0,0,0.06);outline:1px dashed var(--jade);}
+
+  .stub-row{
+    display:flex;background:var(--paper-2);color:var(--text-on-paper);
+    border-radius:0 0 14px 14px;overflow:hidden;
+    font-family:'IBM Plex Mono',monospace;font-size:12px;
+  }
+  .stub{flex:1;padding:12px 20px;border-right:1px dashed #B8A97C;}
+  .stub:last-child{border-right:none;}
+  .stub .k{color:var(--text-muted-paper);text-transform:uppercase;letter-spacing:0.06em;font-size:10px;}
+  .stub .v{font-size:15px;font-weight:500;margin-top:2px;}
+
+  /* ---- tabs ---- */
+  nav.tabs{
+    display:flex;gap:4px;margin:28px 0 0;padding-bottom:0;
+    border-bottom:1px solid #2C4038;
+  }
+  nav.tabs button{
+    background:none;border:none;color:#8FA79C;font-family:'IBM Plex Sans',sans-serif;
+    font-size:14px;font-weight:500;padding:12px 18px;cursor:pointer;
+    border-bottom:2px solid transparent;margin-bottom:-1px;
+    transition:color .15s ease,border-color .15s ease;
+  }
+  nav.tabs button:hover{color:var(--paper);}
+  nav.tabs button.active{color:var(--brass);border-bottom-color:var(--brass);}
+
+  section.panel{display:none;padding-top:28px;animation:fade .25s ease;}
+  section.panel.active{display:block;}
+  @keyframes fade{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:none;}}
+
+  h2.section-title{
+    font-family:'Fraunces',serif;font-weight:500;font-size:20px;color:var(--paper);
+    margin:0 0 4px;
+  }
+  p.section-sub{color:#8FA79C;font-size:13px;margin:0 0 20px;}
+
+  /* ---- itinerary route line ---- */
+  .route-line{position:relative;padding-left:28px;}
+  .route-line::before{
+    content:"";position:absolute;left:9px;top:6px;bottom:6px;width:2px;
+    background:linear-gradient(var(--jade),var(--brass));
+  }
+  .day-card{
+    position:relative;background:var(--paper);color:var(--text-on-paper);
+    border-radius:10px;padding:14px 18px;margin-bottom:10px;
+  }
+  .day-card::before{
+    content:"";position:absolute;left:-28px;top:18px;width:11px;height:11px;
+    border-radius:50%;background:var(--paper);border:2px solid var(--jade-dark);
+  }
+  .day-card.home::before{border-color:var(--chop);}
+  .day-card.is-travel::before{border-color:var(--brass);}
+  .day-card.is-travel{border-left:3px solid var(--brass);padding-left:15px;}
+  .day-head{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;}
+  .day-num{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--text-muted-paper);min-width:20px;}
+  .day-date{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--jade-dark);font-weight:500;}
+  .day-base{
+    font-family:'Fraunces',serif;font-weight:500;font-size:16px;margin-left:auto;
+    background:var(--jade);color:#EAF6F1;padding:2px 10px;border-radius:20px;font-size:12px;
+  }
+  .day-plan{margin-top:6px;font-size:14px;line-height:1.5;}
+  .day-cost{
+    display:inline-block;margin-top:8px;font-family:'IBM Plex Mono',monospace;font-size:12px;
+    color:var(--chop);
+  }
+  .travel-strip{
+    display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+    background:rgba(199,154,75,0.18);border:1px dashed var(--brass);border-radius:8px;
+    padding:8px 12px;margin-bottom:8px;
+  }
+  .travel-mode-select{
+    font-family:'IBM Plex Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:0.05em;
+    border:1px solid var(--brass);border-radius:6px;background:transparent;color:#7A5A1E;
+    padding:3px 6px;cursor:pointer;
+  }
+  .travel-route{font-size:13px;font-weight:500;flex:1;min-width:120px;}
+  .travel-route:empty::before{content:'add route, e.g. Beijing → Zhangjiajie';color:var(--text-muted-paper);font-weight:400;}
+  .travel-cost{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--chop);min-width:20px;}
+  .travel-cost:empty::before{content:'$0';color:var(--text-muted-paper);}
+  .day-controls{display:flex;gap:6px;margin-top:8px;}
+  .mini-btn{
+    background:none;border:1px solid var(--line);color:var(--text-muted-paper);
+    font-size:11px;padding:3px 9px;border-radius:6px;cursor:pointer;font-family:'IBM Plex Sans',sans-serif;
+  }
+  .mini-btn:hover{border-color:var(--chop);color:var(--chop);}
+  .add-day-btn{
+    margin:14px 0 0 -28px;width:calc(100% + 28px);
+    background:none;border:1px dashed #3E5A50;color:#8FA79C;
+    padding:12px;border-radius:10px;cursor:pointer;font-size:13px;font-family:'IBM Plex Sans',sans-serif;
+  }
+  .add-day-btn:hover{border-color:var(--brass);color:var(--brass);}
+
+  /* ---- stays / flights cards ---- */
+  .grid-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;}
+  .stay-card,.leg-card{
+    background:var(--paper);color:var(--text-on-paper);border-radius:10px;padding:16px 18px;
+    position:relative;
+  }
+  .stay-card h3,.leg-card h3{
+    font-family:'Fraunces',serif;font-size:16px;font-weight:500;margin:0 0 4px;
+  }
+  .stay-sub{font-size:12px;color:var(--text-muted-paper);font-family:'IBM Plex Mono',monospace;}
+  .stay-cost{
+    font-family:'IBM Plex Mono',monospace;font-size:18px;font-weight:500;margin-top:10px;color:var(--jade-dark);
+  }
+  .stay-details{
+    margin-top:10px;padding-top:10px;border-top:1px dashed var(--line);
+    font-size:13px;line-height:1.55;min-height:20px;
+  }
+  .stay-details:empty::before{content:'Add confirmation #, address, check-in notes…';color:var(--text-muted-paper);}
+  .chop{
+    position:absolute;top:14px;right:14px;width:34px;height:34px;border-radius:50%;
+    border:2px solid var(--chop);display:flex;align-items:center;justify-content:center;
+    font-family:'IBM Plex Mono',monospace;font-size:9px;font-weight:500;color:var(--chop);
+    background:transparent;cursor:pointer;letter-spacing:0.02em;transform:rotate(-8deg);
+    transition:background .15s ease,color .15s ease;user-select:none;
+  }
+  .chop.booked{background:var(--chop);color:#FBEAE7;}
+  .del-x{
+    position:absolute;bottom:12px;right:14px;background:none;border:none;color:var(--text-muted-paper);
+    font-size:11px;cursor:pointer;font-family:'IBM Plex Sans',sans-serif;
+  }
+  .del-x:hover{color:var(--chop);}
+  .add-card-btn{
+    background:none;border:1px dashed var(--line);color:var(--text-muted-paper);
+    padding:16px;border-radius:10px;cursor:pointer;font-size:13px;font-family:'IBM Plex Sans',sans-serif;
+    min-height:90px;display:flex;align-items:center;justify-content:center;
+  }
+  .add-card-btn:hover{border-color:var(--jade);color:var(--jade-dark);background:rgba(62,124,107,0.06);}
+
+  /* ---- budget ledger ---- */
+  .ledger{background:var(--paper);color:var(--text-on-paper);border-radius:10px;overflow:hidden;}
+  .ledger-row{
+    display:grid;grid-template-columns:1fr 120px 90px 32px;gap:10px;align-items:center;
+    padding:11px 18px;border-bottom:1px solid var(--line);font-size:14px;
+  }
+  .ledger-row.head{
+    font-family:'IBM Plex Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:0.06em;
+    color:var(--text-muted-paper);background:var(--paper-2);
+  }
+  .ledger-row .amt{font-family:'IBM Plex Mono',monospace;text-align:right;}
+  .ledger-row select{
+    font-family:'IBM Plex Sans',sans-serif;font-size:11px;border:1px solid var(--line);
+    border-radius:6px;padding:3px 6px;background:transparent;color:var(--text-on-paper);
+  }
+  .ledger-row .rowdel{background:none;border:none;color:var(--text-muted-paper);cursor:pointer;font-size:14px;text-align:center;}
+  .ledger-row .rowdel:hover{color:var(--chop);}
+  .ledger-total{
+    display:flex;justify-content:space-between;align-items:baseline;padding:16px 18px;
+    background:var(--ink-2);color:var(--paper);
+  }
+  .ledger-total .lbl{font-family:'Fraunces',serif;font-size:15px;}
+  .ledger-total .val{font-family:'IBM Plex Mono',monospace;font-size:22px;font-weight:500;color:var(--brass);}
+  .add-row-btn{
+    width:100%;background:var(--paper-2);border:none;color:var(--text-muted-paper);
+    padding:10px;cursor:pointer;font-size:12px;font-family:'IBM Plex Sans',sans-serif;
+  }
+  .add-row-btn:hover{color:var(--jade-dark);}
+  .budget-meta{display:flex;gap:12px;margin-top:14px;flex-wrap:wrap;}
+  .meta-pill{
+    background:var(--paper);color:var(--text-on-paper);border-radius:8px;padding:10px 16px;
+    font-size:12px;flex:1;min-width:150px;
+  }
+  .meta-pill .k{color:var(--text-muted-paper);font-size:10px;text-transform:uppercase;letter-spacing:0.05em;}
+  .meta-pill .v{font-family:'IBM Plex Mono',monospace;font-size:16px;margin-top:3px;}
+
+  /* ---- notes ---- */
+  .notes-box{
+    background:var(--paper);color:var(--text-on-paper);border-radius:10px;padding:18px;
+    min-height:160px;font-size:14px;line-height:1.6;
+  }
+  .save-note{
+    font-family:'IBM Plex Mono',monospace;font-size:11px;color:#5F7A70;text-align:right;margin-top:10px;
+    opacity:0;transition:opacity .3s ease;
+  }
+  .save-note.show{opacity:1;}
+
+  /* ---- ideas / explore ---- */
+  .idea-filters{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:18px;}
+  .filter-pill{
+    background:none;border:1px solid #3E5A50;color:#8FA79C;font-size:12px;
+    padding:5px 13px;border-radius:20px;cursor:pointer;font-family:'IBM Plex Sans',sans-serif;
+  }
+  .filter-pill:hover{border-color:var(--brass);color:var(--brass);}
+  .filter-pill.active{background:var(--brass);border-color:var(--brass);color:var(--ink);}
+  .idea-card{
+    background:var(--paper);color:var(--text-on-paper);border-radius:10px;padding:16px 18px;
+    border-top:3px solid var(--jade);position:relative;
+  }
+  .idea-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
+  .idea-cat-select{
+    font-family:'IBM Plex Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:0.05em;
+    border:none;background:transparent;color:var(--text-muted-paper);padding:0;cursor:pointer;
+  }
+  .idea-card h3{font-family:'Fraunces',serif;font-size:16px;font-weight:500;margin:0 0 4px;}
+  .idea-city-select{
+    font-family:'IBM Plex Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:0.04em;
+    border:1px solid var(--line);border-radius:6px;background:transparent;color:var(--text-muted-paper);
+    padding:4px 8px;cursor:pointer;margin-bottom:8px;width:100%;
+  }
+  .idea-note{font-size:13px;line-height:1.55;min-height:20px;margin-bottom:10px;}
+  .idea-url-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+  .idea-url{
+    font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--jade-dark);
+    word-break:break-all;flex:1;min-width:0;
+  }
+  .idea-url:empty::before{content:'add a link';color:var(--text-muted-paper);}
+  .empty-state{
+    grid-column:1/-1;text-align:center;color:#8FA79C;font-size:13px;padding:30px 10px;
+  }
+  .filter-label{
+    font-family:'IBM Plex Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:0.06em;
+    color:#5F7A70;margin:0 0 6px;
+  }
+
+  /* ---- checklist ---- */
+  .checklist{background:var(--paper);color:var(--text-on-paper);border-radius:10px;overflow:hidden;margin-bottom:26px;}
+  .todo-group-title{
+    font-family:'IBM Plex Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:0.06em;
+    color:var(--text-muted-paper);background:var(--paper-2);padding:8px 18px;
+  }
+  .todo-row{
+    display:flex;align-items:center;gap:10px;padding:9px 18px;border-bottom:1px solid var(--line);
+  }
+  .todo-row input[type="checkbox"]{width:16px;height:16px;accent-color:var(--jade-dark);flex-shrink:0;cursor:pointer;}
+  .todo-text{flex:1;font-size:14px;min-width:0;}
+  .todo-row.done .todo-text{text-decoration:line-through;color:var(--text-muted-paper);}
+  .todo-cat-select{
+    font-family:'IBM Plex Mono',monospace;font-size:10px;text-transform:uppercase;
+    border:1px solid var(--line);border-radius:6px;background:transparent;color:var(--text-muted-paper);
+    padding:3px 6px;cursor:pointer;
+  }
+  .todo-del{background:none;border:none;color:var(--text-muted-paper);cursor:pointer;font-size:13px;}
+  .todo-del:hover{color:var(--chop);}
+  .add-todo-btn{
+    width:100%;background:var(--paper-2);border:none;color:var(--text-muted-paper);
+    padding:10px;cursor:pointer;font-size:12px;font-family:'IBM Plex Sans',sans-serif;
+  }
+  .add-todo-btn:hover{color:var(--jade-dark);}
+
+  @media (max-width:600px){
+    .tag{flex-direction:column;align-items:flex-start;gap:10px;}
+    .tag-right{text-align:left;}
+    .stub-row{flex-wrap:wrap;}
+    .stub{flex:1 1 50%;border-bottom:1px dashed #B8A97C;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="hero">
+    <div class="tag">
+      <div class="tag-left">
+        <h1 id="trip-title" contenteditable="true">Beijing &rarr; Zhangjiajie &rarr; Chongqing &rarr; Hanoi</h1>
+        <div class="route">China &middot; Vietnam &middot; Spring 2027</div>
+      </div>
+      <div class="tag-right">
+        <div class="dates" id="trip-dates" contenteditable="true">Apr 24 &ndash; May 8, 2027</div>
+        <div class="pax">2 travelers &middot; 15 days</div>
+      </div>
+    </div>
+    <div class="stub-row">
+      <div class="stub"><div class="k">Hard costs</div><div class="v" id="stub-hard">$0</div></div>
+      <div class="stub"><div class="k">Flex budget</div><div class="v" id="stub-flex">$0</div></div>
+      <div class="stub"><div class="k">Total</div><div class="v" id="stub-total">$0</div></div>
+      <div class="stub"><div class="k">Per person</div><div class="v" id="stub-each">$0</div></div>
+    </div>
+    <nav class="tabs">
+      <button data-tab="itinerary" class="active">Itinerary</button>
+      <button data-tab="stays">Stays &amp; transport</button>
+      <button data-tab="planning">Planning</button>
+      <button data-tab="budget">Budget</button>
+      <button data-tab="notes">Notes</button>
+    </nav>
+  </header>
+
+  <section class="panel active" id="panel-itinerary">
+    <h2 class="section-title">Day by day</h2>
+    <p class="section-sub">Tap any text to edit. Chop marks travel-day costs.</p>
+    <div class="route-line" id="itinerary-list"></div>
+    <button class="add-day-btn" id="add-day">+ Add a day</button>
+  </section>
+
+  <section class="panel" id="panel-stays">
+    <h2 class="section-title">Stays</h2>
+    <p class="section-sub">Tap the stamp once booked and paid.</p>
+    <div class="grid-cards" id="stays-list"></div>
+    <div style="height:24px;"></div>
+    <h2 class="section-title">Flights &amp; transport</h2>
+    <p class="section-sub">Every leg between cities, plus the long-haul flights.</p>
+    <div class="grid-cards" id="legs-list"></div>
+  </section>
+
+  <section class="panel" id="panel-planning">
+    <h2 class="section-title">Planning</h2>
+    <p class="section-sub">Hotel options, activities, restaurants, shopping &mdash; anything worth saving for later.</p>
+    <div class="filter-label">Category</div>
+    <div class="idea-filters" id="idea-cat-filters"></div>
+    <div class="filter-label">City</div>
+    <div class="idea-filters" id="idea-city-filters"></div>
+    <div class="grid-cards" id="ideas-list"></div>
+  </section>
+
+  <section class="panel" id="panel-budget">
+    <h2 class="section-title">Budget ledger</h2>
+    <p class="section-sub">Every line, editable. Totals update as you go.</p>
+    <div class="ledger" id="ledger">
+      <div class="ledger-row head">
+        <div>Item</div><div>Amount CAD</div><div>Type</div><div></div>
+      </div>
+      <div id="ledger-rows"></div>
+      <button class="add-row-btn" id="add-row">+ Add a line</button>
+      <div class="ledger-total"><span class="lbl">Total</span><span class="val" id="ledger-total-val">$0</span></div>
+    </div>
+    <div class="budget-meta">
+      <div class="meta-pill"><div class="k">Hard costs</div><div class="v" id="meta-hard">$0</div></div>
+      <div class="meta-pill"><div class="k">Flex costs</div><div class="v" id="meta-flex">$0</div></div>
+      <div class="meta-pill"><div class="k">Per person, per month to save</div><div class="v" id="meta-month" contenteditable="true">$875</div></div>
+    </div>
+  </section>
+
+  <section class="panel" id="panel-notes">
+    <h2 class="section-title">Checklist</h2>
+    <p class="section-sub">Visas, eSIMs, cash, documents &mdash; the tasks that actually need doing before you go.</p>
+    <div class="checklist" id="checklist"></div>
+    <button class="add-todo-btn" id="add-todo">+ Add a task</button>
+    <div style="height:26px;"></div>
+    <h2 class="section-title">Other notes</h2>
+    <p class="section-sub">Packing list, reservations, anything else that needs a home.</p>
+    <div class="notes-box" id="notes-box" contenteditable="true"></div>
+  </section>
+
+  <div class="save-note" id="save-note">saved</div>
+</div>
+
+<script>
+const STORAGE_KEY = 'asia-trip-bible-2027';
+
+const defaultData = {
+  tripTitle: 'Beijing → Zhangjiajie → Chongqing → Hanoi',
+  tripDates: 'Apr 24 – May 8, 2027',
+  monthlyTarget: '$875',
+  notes: '',
+  days: [
+    {date:'Apr 24', base:'Beijing', plan:'Arrive mid-day or evening', cost:'', home:false, travel:true, mode:'flight', route:'Kelowna → Beijing', travelCost:'$3,400'},
+    {date:'Apr 25', base:'Beijing', plan:'Forbidden City + hutongs + shopping', cost:'', home:false, travel:false, mode:'flight', route:''},
+    {date:'Apr 26', base:'Beijing', plan:'Great Wall + shopping + food', cost:'', home:false, travel:false, mode:'flight', route:''},
+    {date:'Apr 27', base:'Zhangjiajie', plan:'Settle in around Wulingyuan', cost:'', home:false, travel:true, mode:'flight', route:'Beijing → Zhangjiajie', travelCost:'$700'},
+    {date:'Apr 28', base:'Zhangjiajie', plan:'National Forest Park + grand canyon', cost:'', home:false, travel:false, mode:'flight', route:''},
+    {date:'Apr 29', base:'Zhangjiajie', plan:'Tianmen Mountain → Furong', cost:'', home:false, travel:false, mode:'flight', route:''},
+    {date:'Apr 30', base:'Chongqing', plan:'Half city + food', cost:'', home:false, travel:true, mode:'train', route:'Zhangjiajie → Chongqing', travelCost:'$60'},
+    {date:'May 1', base:'Chongqing', plan:'City + food, shopping + nightlife', cost:'', home:false, travel:false, mode:'flight', route:''},
+    {date:'May 2', base:'Hanoi', plan:'', cost:'', home:false, travel:true, mode:'flight', route:'Chongqing → Hanoi', travelCost:'$700'},
+    {date:'May 3', base:'Hanoi', plan:'Shopping and explore', cost:'', home:false, travel:false, mode:'flight', route:''},
+    {date:'May 4', base:'Hanoi', plan:'Ninh Binh day trip', cost:'', home:false, travel:false, mode:'flight', route:''},
+    {date:'May 5', base:'Hanoi', plan:'Overnight on the boat', cost:'', home:false, travel:true, mode:'ferry', route:'Hanoi → Halong Bay', travelCost:'$600'},
+    {date:'May 6', base:'Hanoi', plan:'Halong Bay, back to Hanoi', cost:'', home:false, travel:false, mode:'flight', route:''},
+    {date:'May 7', base:'Hanoi', plan:'Shopping and explore', cost:'', home:false, travel:false, mode:'flight', route:''},
+    {date:'May 8', base:'Home', plan:'', cost:'', home:true, travel:true, mode:'flight', route:'Hanoi → Kelowna', travelCost:'$2,000'}
+  ],
+  stays: [
+    {name:'Beijing hotel', sub:'3 nights', cost:'$700', booked:false, details:''},
+    {name:'Waterfront Huajian Inn', sub:'Zhangjiajie · 3 nights', cost:'$500', booked:false, details:''},
+    {name:'Chongqing hotel', sub:'2 nights', cost:'$400', booked:false, details:''},
+    {name:'Hanoi hotel', sub:'6 nights', cost:'$750', booked:false, details:''}
+  ],
+  legs: [
+    {name:'Cathay Pacific — outbound', sub:'Kelowna → Beijing', cost:'$3,400', booked:false},
+    {name:'Return flight', sub:'Hanoi → Kelowna', cost:'$2,000', booked:false},
+    {name:'Beijing → Zhangjiajie', sub:'Flight', cost:'$700', booked:false},
+    {name:'Zhangjiajie → Chongqing', sub:'Train', cost:'$60', booked:false},
+    {name:'Chongqing → Hanoi', sub:'Flight', cost:'$700', booked:false},
+    {name:'Halong Bay cruise', sub:'2 days, 1 night', cost:'$600', booked:false}
+  ],
+  ideas: [],
+  todos: [
+    {text:'Get visas', category:'Visas', done:false},
+    {text:'Get eSIMs', category:'eSIM', done:false},
+    {text:'Get cash', category:'Cash', done:false}
+  ],
+  ledger: [
+    {item:'Cathay Pacific — outbound', amount:3400, type:'hard'},
+    {item:'Return flight', amount:2000, type:'hard'},
+    {item:'Beijing hotel (3 nights)', amount:700, type:'hard'},
+    {item:'Waterfront Huajian Inn (3 nights)', amount:500, type:'hard'},
+    {item:'Chongqing hotel (2 nights)', amount:400, type:'hard'},
+    {item:'Hanoi hotel (6 nights)', amount:750, type:'hard'},
+    {item:'Beijing → Zhangjiajie flight', amount:700, type:'hard'},
+    {item:'Zhangjiajie → Chongqing train', amount:60, type:'hard'},
+    {item:'Chongqing → Hanoi flight', amount:700, type:'hard'},
+    {item:'Halong Bay cruise', amount:600, type:'hard'},
+    {item:'Food, shopping, activities', amount:4000, type:'flex'}
+  ]
+};
+
+let data = JSON.parse(JSON.stringify(defaultData));
+let saveTimer = null;
+let ideaFilter = 'All';
+let cityFilter = 'All';
+const IDEA_CATEGORIES = ['Hotel option','Activity','Restaurant','Shopping','Nightlife','Other'];
+const IDEA_COLORS = {
+  'Hotel option':'#3E7C6B','Activity':'#C79A4B','Restaurant':'#A63A2E',
+  'Shopping':'#7A5C7A','Nightlife':'#8A4A6B','Other':'#7A7360'
+};
+const TODO_CATEGORIES = ['Visas','eSIM','Cash','Documents','Packing','Other'];
+
+function fmt(n){
+  n = Math.round(Number(n)||0);
+  return '$' + n.toLocaleString('en-CA');
+}
+
+function parseAmt(v){
+  const n = parseFloat(String(v).replace(/[^0-9.\-]/g,''));
+  return isNaN(n) ? 0 : n;
+}
+
+async function loadData(){
+  try{
+    const res = await window.storage.get(STORAGE_KEY, true);
+    if(res && res.value){
+      const parsed = JSON.parse(res.value);
+      data = Object.assign(JSON.parse(JSON.stringify(defaultData)), parsed);
+    }
+  }catch(e){
+    console.log('No saved data yet, using defaults.');
+  }
+  renderAll();
+}
+
+async function persist(){
+  try{
+    await window.storage.set(STORAGE_KEY, JSON.stringify(data), true);
+    const note = document.getElementById('save-note');
+    note.classList.add('show');
+    clearTimeout(persist._t);
+    persist._t = setTimeout(()=>note.classList.remove('show'), 1200);
+  }catch(e){
+    console.error('Storage error', e);
+  }
+}
+
+function queueSave(){
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(persist, 500);
+}
+
+function renderAll(){
+  document.getElementById('trip-title').textContent = data.tripTitle;
+  document.getElementById('trip-dates').textContent = data.tripDates;
+  document.getElementById('notes-box').textContent = data.notes;
+  document.getElementById('meta-month').textContent = data.monthlyTarget;
+  renderItinerary();
+  renderStays();
+  renderLegs();
+  renderIdeas();
+  renderTodos();
+  renderLedger();
+  updateTotals();
+}
+
+function renderItinerary(){
+  const el = document.getElementById('itinerary-list');
+  el.innerHTML = '';
+  data.days.forEach((d, i)=>{
+    const card = document.createElement('div');
+    card.className = 'day-card' + (d.home ? ' home' : '') + (d.travel ? ' is-travel' : '');
+    const travelStrip = d.travel ? `
+      <div class="travel-strip">
+        <select class="travel-mode-select" data-i="${i}">
+          <option value="flight" ${d.mode==='flight'?'selected':''}>Flight</option>
+          <option value="train" ${d.mode==='train'?'selected':''}>Train</option>
+          <option value="ferry" ${d.mode==='ferry'?'selected':''}>Ferry</option>
+          <option value="car" ${d.mode==='car'?'selected':''}>Car</option>
+          <option value="other" ${d.mode==='other'?'selected':''}>Other</option>
+        </select>
+        <span class="travel-route" contenteditable="true" data-i="${i}" data-f="route">${d.route||''}</span>
+        <span class="travel-cost" contenteditable="true" data-i="${i}" data-f="travelCost">${d.travelCost||''}</span>
+      </div>` : '';
+    card.innerHTML = `
+      <div class="day-head">
+        <span class="day-num">${String(i+1).padStart(2,'0')}</span>
+        <span class="day-date" contenteditable="true" data-i="${i}" data-f="date">${d.date}</span>
+        <span class="day-base" contenteditable="true" data-i="${i}" data-f="base">${d.base}</span>
+      </div>
+      ${travelStrip}
+      <div class="day-plan" contenteditable="true" data-i="${i}" data-f="plan">${d.plan}</div>
+      ${d.cost ? `<div class="day-cost" contenteditable="true" data-i="${i}" data-f="cost">${d.cost}</div>` : `<button class="mini-btn add-cost" data-i="${i}">+ add cost</button>`}
+      <div class="day-controls">
+        <button class="mini-btn move-up" data-i="${i}">↑</button>
+        <button class="mini-btn move-down" data-i="${i}">↓</button>
+        <button class="mini-btn toggle-travel" data-i="${i}">${d.travel ? 'remove travel' : 'mark as travel'}</button>
+        <button class="mini-btn del-day" data-i="${i}">remove</button>
+      </div>
+    `;
+    el.appendChild(card);
+  });
+
+  el.querySelectorAll('[contenteditable][data-f]').forEach(node=>{
+    node.addEventListener('blur', ()=>{
+      const i = +node.dataset.i, f = node.dataset.f;
+      data.days[i][f] = node.textContent.trim();
+      if(f==='cost' || f==='travelCost') updateTotals();
+      queueSave();
+    });
+  });
+  el.querySelectorAll('.travel-mode-select').forEach(sel=>{
+    sel.addEventListener('change', ()=>{
+      data.days[+sel.dataset.i].mode = sel.value;
+      queueSave();
+    });
+  });
+  el.querySelectorAll('.toggle-travel').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const d = data.days[+btn.dataset.i];
+      d.travel = !d.travel;
+      if(d.travel && !d.mode) d.mode = 'flight';
+      renderItinerary(); updateTotals(); queueSave();
+    });
+  });
+  el.querySelectorAll('.del-day').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      data.days.splice(+btn.dataset.i,1);
+      renderItinerary(); updateTotals(); queueSave();
+    });
+  });
+  el.querySelectorAll('.move-up').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const i = +btn.dataset.i;
+      if(i>0){ [data.days[i-1],data.days[i]]=[data.days[i],data.days[i-1]]; renderItinerary(); queueSave(); }
+    });
+  });
+  el.querySelectorAll('.move-down').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const i = +btn.dataset.i;
+      if(i<data.days.length-1){ [data.days[i+1],data.days[i]]=[data.days[i],data.days[i+1]]; renderItinerary(); queueSave(); }
+    });
+  });
+  el.querySelectorAll('.add-cost').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      data.days[+btn.dataset.i].cost = '$0';
+      renderItinerary(); queueSave();
+    });
+  });
+}
+
+document.getElementById('add-day').addEventListener('click', ()=>{
+  data.days.push({date:'New date', base:'City', plan:'Plan for this day', cost:'', home:false});
+  renderItinerary(); queueSave();
+});
+
+function renderStays(){
+  const el = document.getElementById('stays-list');
+  el.innerHTML = '';
+  data.stays.forEach((s,i)=>{
+    const card = document.createElement('div');
+    card.className = 'stay-card';
+    card.innerHTML = `
+      <button class="chop ${s.booked?'booked':''}" data-list="stays" data-i="${i}">${s.booked?'BOOKED':'TO BOOK'}</button>
+      <h3 contenteditable="true" data-list="stays" data-i="${i}" data-f="name">${s.name}</h3>
+      <div class="stay-sub" contenteditable="true" data-list="stays" data-i="${i}" data-f="sub">${s.sub}</div>
+      <div class="stay-cost" contenteditable="true" data-list="stays" data-i="${i}" data-f="cost">${s.cost}</div>
+      <div class="stay-details" contenteditable="true" data-list="stays" data-i="${i}" data-f="details">${s.details||''}</div>
+      <button class="del-x" data-list="stays" data-i="${i}" style="position:static;display:block;margin-top:6px;text-align:right;width:100%;">remove</button>
+    `;
+    el.appendChild(card);
+  });
+  const addBtn = document.createElement('button');
+  addBtn.className = 'add-card-btn';
+  addBtn.textContent = '+ Add a stay';
+  addBtn.addEventListener('click', ()=>{
+    data.stays.push({name:'New stay', sub:'Nights', cost:'$0', booked:false, details:''});
+    renderStays(); queueSave();
+  });
+  el.appendChild(addBtn);
+  bindCardEvents();
+}
+
+function renderLegs(){
+  const el = document.getElementById('legs-list');
+  el.innerHTML = '';
+  data.legs.forEach((s,i)=>{
+    const card = document.createElement('div');
+    card.className = 'leg-card';
+    card.innerHTML = `
+      <button class="chop ${s.booked?'booked':''}" data-list="legs" data-i="${i}">${s.booked?'BOOKED':'TO BOOK'}</button>
+      <h3 contenteditable="true" data-list="legs" data-i="${i}" data-f="name">${s.name}</h3>
+      <div class="stay-sub" contenteditable="true" data-list="legs" data-i="${i}" data-f="sub">${s.sub}</div>
+      <div class="stay-cost" contenteditable="true" data-list="legs" data-i="${i}" data-f="cost">${s.cost}</div>
+      <button class="del-x" data-list="legs" data-i="${i}">remove</button>
+    `;
+    el.appendChild(card);
+  });
+  const addBtn = document.createElement('button');
+  addBtn.className = 'add-card-btn';
+  addBtn.textContent = '+ Add a flight or transfer';
+  addBtn.addEventListener('click', ()=>{
+    data.legs.push({name:'New leg', sub:'Route', cost:'$0', booked:false});
+    renderLegs(); queueSave();
+  });
+  el.appendChild(addBtn);
+  bindCardEvents();
+}
+
+function bindCardEvents(){
+  document.querySelectorAll('.chop').forEach(btn=>{
+    btn.onclick = ()=>{
+      const list = btn.dataset.list, i = +btn.dataset.i;
+      data[list][i].booked = !data[list][i].booked;
+      if(list==='stays') renderStays(); else renderLegs();
+      queueSave();
+    };
+  });
+  document.querySelectorAll('.del-x').forEach(btn=>{
+    btn.onclick = ()=>{
+      const list = btn.dataset.list, i = +btn.dataset.i;
+      data[list].splice(i,1);
+      if(list==='stays') renderStays(); else renderLegs();
+      queueSave();
+    };
+  });
+  document.querySelectorAll('[contenteditable][data-list]').forEach(node=>{
+    node.onblur = ()=>{
+      const list = node.dataset.list, i = +node.dataset.i, f = node.dataset.f;
+      data[list][i][f] = node.textContent.trim();
+      queueSave();
+    };
+  });
+}
+
+function renderIdeaFilters(){
+  const catEl = document.getElementById('idea-cat-filters');
+  const allCats = ['All', ...IDEA_CATEGORIES];
+  catEl.innerHTML = allCats.map(c=>`<button class="filter-pill ${c===ideaFilter?'active':''}" data-cat="${c}">${c}</button>`).join('');
+  catEl.querySelectorAll('.filter-pill').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      ideaFilter = btn.dataset.cat;
+      renderIdeas();
+    });
+  });
+
+  const cityEl = document.getElementById('idea-city-filters');
+  const itineraryCities = getItineraryCities();
+  const allCities = ['All', ...itineraryCities];
+  cityEl.innerHTML = allCities.map(c=>`<button class="filter-pill ${c===cityFilter?'active':''}" data-city="${c}">${c}</button>`).join('');
+  cityEl.querySelectorAll('.filter-pill').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      cityFilter = btn.dataset.city;
+      renderIdeas();
+    });
+  });
+}
+
+function getItineraryCities(){
+  return Array.from(new Set(data.days.map(d=>d.base).filter(b=>b && b.trim().toLowerCase()!=='home')));
+}
+
+function renderIdeas(){
+  renderIdeaFilters();
+  const el = document.getElementById('ideas-list');
+  el.innerHTML = '';
+  const cityOptions = getItineraryCities();
+  const filtered = data.ideas
+    .map((s,i)=>({s,i}))
+    .filter(x => (ideaFilter==='All' || x.s.category===ideaFilter))
+    .filter(x => (cityFilter==='All' || x.s.city===cityFilter));
+
+  if(filtered.length===0){
+    el.innerHTML = '<div class="empty-state">Nothing saved here yet. Add hotel options, activities, restaurants, shopping spots, or links to keep exploring.</div>';
+  }else{
+    filtered.forEach(({s,i})=>{
+      const card = document.createElement('div');
+      card.className = 'idea-card';
+      card.style.borderTopColor = IDEA_COLORS[s.category] || IDEA_COLORS.Other;
+      card.innerHTML = `
+        <div class="idea-top">
+          <select class="idea-cat-select" data-i="${i}">
+            ${IDEA_CATEGORIES.map(c=>`<option value="${c}" ${c===s.category?'selected':''}>${c}</option>`).join('')}
+          </select>
+          <button class="del-x" data-i="${i}" style="position:static;">remove</button>
+        </div>
+        <h3 contenteditable="true" data-i="${i}" data-f="title">${s.title}</h3>
+        <select class="idea-city-select" data-i="${i}">
+          <option value="" ${!s.city?'selected':''}>Select city</option>
+          ${cityOptions.map(c=>`<option value="${c}" ${c===s.city?'selected':''}>${c}</option>`).join('')}
+          <option value="Other" ${s.city==='Other'?'selected':''}>Other</option>
+        </select>
+        <div class="idea-note" contenteditable="true" data-i="${i}" data-f="note">${s.note}</div>
+        <div class="idea-url-row">
+          <span class="idea-url" contenteditable="true" data-i="${i}" data-f="url">${s.url}</span>
+          ${s.url ? `<button class="mini-btn open-link" data-i="${i}">Open ↗</button>` : ''}
+        </div>
+      `;
+      el.appendChild(card);
+    });
+  }
+
+  const addBtn = document.createElement('button');
+  addBtn.className = 'add-card-btn';
+  addBtn.textContent = '+ Add to explore';
+  addBtn.addEventListener('click', ()=>{
+    data.ideas.push({
+      title:'New idea',
+      category: ideaFilter==='All' ? 'Activity' : ideaFilter,
+      city: cityFilter==='All' ? '' : cityFilter,
+      note:'', url:''
+    });
+    renderIdeas(); queueSave();
+  });
+  el.appendChild(addBtn);
+  bindIdeaEvents();
+}
+
+function bindIdeaEvents(){
+  document.querySelectorAll('.idea-cat-select').forEach(sel=>{
+    sel.onchange = ()=>{
+      data.ideas[+sel.dataset.i].category = sel.value;
+      renderIdeas(); queueSave();
+    };
+  });
+  document.querySelectorAll('.idea-city-select').forEach(sel=>{
+    sel.onchange = ()=>{
+      data.ideas[+sel.dataset.i].city = sel.value;
+      renderIdeas(); queueSave();
+    };
+  });
+  document.querySelectorAll('.open-link').forEach(btn=>{
+    btn.onclick = ()=>{
+      let url = data.ideas[+btn.dataset.i].url;
+      if(url && !/^https?:\/\//i.test(url)) url = 'https://' + url;
+      window.open(url, '_blank');
+    };
+  });
+  document.querySelectorAll('#ideas-list .del-x').forEach(btn=>{
+    btn.onclick = ()=>{
+      data.ideas.splice(+btn.dataset.i,1);
+      renderIdeas(); queueSave();
+    };
+  });
+  document.querySelectorAll('#ideas-list [contenteditable][data-f]').forEach(node=>{
+    node.onblur = ()=>{
+      const i = +node.dataset.i, f = node.dataset.f;
+      data.ideas[i][f] = node.textContent.trim();
+      queueSave();
+      if(f==='url') renderIdeas();
+    };
+  });
+}
+
+function renderTodos(){
+  const el = document.getElementById('checklist');
+  el.innerHTML = '';
+  const grouped = TODO_CATEGORIES.map(cat => ({
+    cat,
+    items: data.todos.map((t,i)=>({t,i})).filter(x=>x.t.category===cat)
+  })).filter(g=>g.items.length>0);
+
+  if(grouped.length===0){
+    el.innerHTML = '<div class="empty-state">No tasks yet. Add visas, eSIMs, cash runs — whatever needs doing before you fly.</div>';
+  }else{
+    grouped.forEach(g=>{
+      const header = document.createElement('div');
+      header.className = 'todo-group-title';
+      header.textContent = g.cat;
+      el.appendChild(header);
+      g.items.forEach(({t,i})=>{
+        const row = document.createElement('div');
+        row.className = 'todo-row' + (t.done ? ' done' : '');
+        row.innerHTML = `
+          <input type="checkbox" data-i="${i}" ${t.done?'checked':''}>
+          <div class="todo-text" contenteditable="true" data-i="${i}">${t.text}</div>
+          <select class="todo-cat-select" data-i="${i}">
+            ${TODO_CATEGORIES.map(c=>`<option value="${c}" ${c===t.category?'selected':''}>${c}</option>`).join('')}
+          </select>
+          <button class="todo-del" data-i="${i}">✕</button>
+        `;
+        el.appendChild(row);
+      });
+    });
+  }
+  bindTodoEvents();
+}
+
+function bindTodoEvents(){
+  document.querySelectorAll('.todo-row input[type="checkbox"]').forEach(cb=>{
+    cb.onchange = ()=>{
+      data.todos[+cb.dataset.i].done = cb.checked;
+      renderTodos(); queueSave();
+    };
+  });
+  document.querySelectorAll('.todo-text').forEach(node=>{
+    node.onblur = ()=>{
+      data.todos[+node.dataset.i].text = node.textContent.trim();
+      queueSave();
+    };
+  });
+  document.querySelectorAll('.todo-cat-select').forEach(sel=>{
+    sel.onchange = ()=>{
+      data.todos[+sel.dataset.i].category = sel.value;
+      renderTodos(); queueSave();
+    };
+  });
+  document.querySelectorAll('.todo-del').forEach(btn=>{
+    btn.onclick = ()=>{
+      data.todos.splice(+btn.dataset.i,1);
+      renderTodos(); queueSave();
+    };
+  });
+}
+
+document.getElementById('add-todo').addEventListener('click', ()=>{
+  data.todos.push({text:'New task', category:'Other', done:false});
+  renderTodos(); queueSave();
+});
+
+function renderLedger(){
+  const el = document.getElementById('ledger-rows');
+  el.innerHTML = '';
+  data.ledger.forEach((row,i)=>{
+    const r = document.createElement('div');
+    r.className = 'ledger-row';
+    r.innerHTML = `
+      <div contenteditable="true" data-i="${i}" data-f="item">${row.item}</div>
+      <div class="amt" contenteditable="true" data-i="${i}" data-f="amount">${row.amount}</div>
+      <div>
+        <select data-i="${i}">
+          <option value="hard" ${row.type==='hard'?'selected':''}>Hard</option>
+          <option value="flex" ${row.type==='flex'?'selected':''}>Flex</option>
+        </select>
+      </div>
+      <button class="rowdel" data-i="${i}">✕</button>
+    `;
+    el.appendChild(r);
+  });
+
+  el.querySelectorAll('[contenteditable]').forEach(node=>{
+    node.addEventListener('blur', ()=>{
+      const i = +node.dataset.i, f = node.dataset.f;
+      if(f==='amount'){
+        data.ledger[i].amount = parseAmt(node.textContent);
+        node.textContent = data.ledger[i].amount;
+      }else{
+        data.ledger[i][f] = node.textContent.trim();
+      }
+      updateTotals();
+      queueSave();
+    });
+  });
+  el.querySelectorAll('select').forEach(sel=>{
+    sel.addEventListener('change', ()=>{
+      data.ledger[+sel.dataset.i].type = sel.value;
+      updateTotals();
+      queueSave();
+    });
+  });
+  el.querySelectorAll('.rowdel').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      data.ledger.splice(+btn.dataset.i,1);
+      renderLedger(); updateTotals(); queueSave();
+    });
+  });
+}
+
+document.getElementById('add-row').addEventListener('click', ()=>{
+  data.ledger.push({item:'New line', amount:0, type:'flex'});
+  renderLedger(); queueSave();
+});
+
+function updateTotals(){
+  const hard = data.ledger.filter(r=>r.type==='hard').reduce((s,r)=>s+parseAmt(r.amount),0);
+  const flex = data.ledger.filter(r=>r.type==='flex').reduce((s,r)=>s+parseAmt(r.amount),0);
+  const total = hard + flex;
+  const each = total/2;
+  document.getElementById('stub-hard').textContent = fmt(hard);
+  document.getElementById('stub-flex').textContent = fmt(flex);
+  document.getElementById('stub-total').textContent = fmt(total);
+  document.getElementById('stub-each').textContent = fmt(each);
+  document.getElementById('ledger-total-val').textContent = fmt(total);
+  document.getElementById('meta-hard').textContent = fmt(hard);
+  document.getElementById('meta-flex').textContent = fmt(flex);
+}
+
+document.getElementById('meta-month').addEventListener('blur', (e)=>{
+  data.monthlyTarget = e.target.textContent.trim();
+  queueSave();
+});
+
+document.getElementById('trip-title').addEventListener('blur', (e)=>{
+  data.tripTitle = e.target.textContent.trim();
+  queueSave();
+});
+document.getElementById('trip-dates').addEventListener('blur', (e)=>{
+  data.tripDates = e.target.textContent.trim();
+  queueSave();
+});
+document.getElementById('notes-box').addEventListener('blur', (e)=>{
+  data.notes = e.target.textContent;
+  queueSave();
+});
+
+document.querySelectorAll('nav.tabs button').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('nav.tabs button').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('section.panel').forEach(p=>p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('panel-'+btn.dataset.tab).classList.add('active');
+  });
+});
+
+loadData();
+</script>
+</body>
+</html>
