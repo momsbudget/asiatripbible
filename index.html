@@ -263,7 +263,11 @@
   .idea-url-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
   .idea-url{
     font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--jade-dark);
-    word-break:break-all;flex:1;min-width:0;
+    flex:1;min-width:0;display:block;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  }
+  .idea-url:focus{
+    white-space:normal;word-break:break-all;overflow:visible;text-overflow:clip;
   }
   .idea-url:empty::before{content:'add a link';color:var(--text-muted-paper);}
   .empty-state{
@@ -400,12 +404,12 @@ import { getFirestore, doc, getDoc, setDoc, onSnapshot } from "https://www.gstat
 
 // ── PASTE YOUR FIREBASE CONFIG HERE ─────────────────────────────
 const firebaseConfig = {
-  apiKey: "AIzaSyB7mNT3vie_gbnVOoQAc_CrvSfJe1YkE5Q",
-  authDomain: "asia-trip-2027.firebaseapp.com",
-  projectId: "asia-trip-2027",
-  storageBucket: "asia-trip-2027.firebasestorage.app",
-  messagingSenderId: "957783717640",
-  appId: "1:957783717640:web:a9b9d1bfdcdb64b995debd"
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_PROJECT.firebaseapp.com",
+  projectId: "YOUR_PROJECT_ID",
+  storageBucket: "YOUR_PROJECT.appspot.com",
+  messagingSenderId: "YOUR_SENDER_ID",
+  appId: "YOUR_APP_ID"
 };
 // ─────────────────────────────────────────────────────────────────
 
