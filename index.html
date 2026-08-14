@@ -394,8 +394,24 @@
   <div class="save-note" id="save-note">saved</div>
 </div>
 
-<script>
-const STORAGE_KEY = 'asia-trip-bible-2027';
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
+import { getFirestore, doc, getDoc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+
+// ── PASTE YOUR FIREBASE CONFIG HERE ─────────────────────────────
+const firebaseConfig = {
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_PROJECT.firebaseapp.com",
+  projectId: "YOUR_PROJECT_ID",
+  storageBucket: "YOUR_PROJECT.appspot.com",
+  messagingSenderId: "YOUR_SENDER_ID",
+  appId: "YOUR_APP_ID"
+};
+// ─────────────────────────────────────────────────────────────────
+
+const firebaseApp = initializeApp(firebaseConfig);
+const db = getFirestore(firebaseApp);
+const tripDocRef = doc(db, "trips", "asia-2027");
 
 const defaultData = {
   tripTitle: 'Beijing → Zhangjiajie → Chongqing → Hanoi',
@@ -475,28 +491,40 @@ function parseAmt(v){
   return isNaN(n) ? 0 : n;
 }
 
-async function loadData(){
+async function initSync(){
   try{
-    const res = await window.storage.get(STORAGE_KEY, true);
-    if(res && res.value){
-      const parsed = JSON.parse(res.value);
-      data = Object.assign(JSON.parse(JSON.stringify(defaultData)), parsed);
+    const snap = await getDoc(tripDocRef);
+    if(snap.exists()){
+      data = Object.assign(JSON.parse(JSON.stringify(defaultData)), snap.data());
+    }else{
+      await setDoc(tripDocRef, data);
     }
   }catch(e){
-    console.log('No saved data yet, using defaults.');
+    console.error('Firestore load error', e);
   }
   renderAll();
+
+  // Live sync: fires whenever either of you saves a change
+  onSnapshot(tripDocRef, (snap) => {
+    if(snap.metadata.hasPendingWrites) return; // this is our own write, already rendered
+    if(!snap.exists()) return;
+    const active = document.activeElement;
+    const isEditing = active && (active.isContentEditable || active.tagName === 'SELECT');
+    if(isEditing) return; // don't yank the page out from under an active edit
+    data = Object.assign(JSON.parse(JSON.stringify(defaultData)), snap.data());
+    renderAll();
+  });
 }
 
 async function persist(){
   try{
-    await window.storage.set(STORAGE_KEY, JSON.stringify(data), true);
+    await setDoc(tripDocRef, data);
     const note = document.getElementById('save-note');
     note.classList.add('show');
     clearTimeout(persist._t);
     persist._t = setTimeout(()=>note.classList.remove('show'), 1200);
   }catch(e){
-    console.error('Storage error', e);
+    console.error('Firestore save error', e);
   }
 }
 
@@ -967,7 +995,7 @@ document.querySelectorAll('nav.tabs button').forEach(btn=>{
   });
 });
 
-loadData();
+initSync();
 </script>
 </body>
 </html>
